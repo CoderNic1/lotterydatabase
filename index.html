@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lottery Winnings Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            max-width: 450px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .login-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc3545;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.profit {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-card.loss {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .sub-value {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .person-stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .person-stats h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .person-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .bar {
+            flex: 1;
+            margin: 0 5px;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            min-height: 20px;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-bar select, .filter-bar input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .log-entry {
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .log-entry:hover {
+            transform: translateY(-3px);
+        }
+
+        .log-entry.win {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 25px;
+        }
+
+        .log-entry.loss {
+            background: #f8f9fa;
+            color: #6c757d;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .log-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .log-entry.loss .log-title {
+            font-size: 1.1em;
+        }
+
+        .log-date {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .log-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .log-detail {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .log-entry.loss .log-detail {
+            background: white;
+        }
+
+        .log-detail-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .log-detail-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .log-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            background: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            background: rgba(102, 126, 234, 0.8);
+        }
+
+        .edit-btn:hover {
+            background: #667eea;
+        }
+
+        .delete-btn:hover {
+            background: #dc3545;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .roi-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .roi-indicator.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .roi-indicator.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .highlight-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .highlight-card {
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .highlight-card h4 {
+            font-size: 0.9em;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .highlight-card .card-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .highlight-card .card-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #11998e;
+        }
+
+        .highlight-card.worst .card-value {
+            color: #dc3545;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .summary-box h3 {
+            margin-bottom: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .reset-request {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .reset-request h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .reset-status {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .reset-user {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .reset-user.accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .reset-user.pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .sync-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-header">
+            <h1>🎰 Lottery Tracker</h1>
+            <p style="color: #6c757d;">Secure Login</p>
+        </div>
+
+        <div class="login-tabs">
+            <div class="login-tab active" onclick="switchLoginTab('login')">Login</div>
+            <div class="login-tab" onclick="switchLoginTab('register')">Register</div>
+        </div>
+
+        <div id="loginError" class="error-message" style="display: none;"></div>
+        <div id="loginSuccess" class="success-message" style="display: none;"></div>
+
+        <form id="loginForm" class="login-form active">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <form id="registerForm" class="login-form">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="registerUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="registerPassword" required>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="registerPasswordConfirm" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Account</button>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #6c757d; text-align: center;">
+                Maximum 3 accounts can be created
+            </p>
+        </form>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="container" style="display: none;">
+        <div class="header">
+            <div class="header-left">
+                <h1>🎰 Lottery Winnings Tracker</h1>
+                <p>Track your scratch card wins and losses</p>
+            </div>
+            <div class="header-right">
+                <div class="user-badge">👤 <span id="currentUser"></span></div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div id="syncInfo" class="sync-info" style="margin: 20px 30px 0;">
+            Last synced: <span id="lastSync">Never</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" onclick="switchTab('analytics')">📈 Analytics</button>
+            <button class="tab" onclick="switchTab('logbook')">📖 Logbook</button>
+            <button class="tab" onclick="switchTab('newlog')">➕ New Log</button>
+            <button class="tab" onclick="switchTab('settings')">⚙️ Settings</button>
+        </div>
+
+        <div class="content">
+            <div id="dashboard" class="tab-content active">
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="summary-box" id="summaryBox"></div>
+                <div class="person-stats" id="personStats"></div>
+            </div>
+
+            <div id="analytics" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Performance Analytics</h2>
+                <div class="highlight-cards" id="highlightCards"></div>
+                <div class="chart-container">
+                    <h3>Cards Played by Owner</h3>
+                    <div class="bar-chart" id="ownerChart"></div>
+                </div>
+                <div class="chart-container">
+                    <h3>ROI by Card Type</h3>
+                    <div id="cardTypeStats"></div>
+                </div>
+            </div>
+
+            <div id="logbook" class="tab-content">
+                <h2 style="margin-bottom: 20px;">All Entries</h2>
+                <div class="filter-bar">
+                    <select id="filterOwner" onchange="updateLogbook()">
+                        <option value="">All Owners</option>
+                    </select>
+                    <select id="filterResult" onchange="updateLogbook()">
+                        <option value="">All Results</option>
+                        <option value="win">Wins Only</option>
+                        <option value="loss">Losses Only</option>
+                    </select>
+                    <select id="sortBy" onchange="updateLogbook()">
+                        <option value="date">Sort by Date (Newest)</option>
+                        <option value="winnings">Sort by Winnings</option>
+                        <option value="profit">Sort by Profit</option>
+                    </select>
+                    <button class="btn btn-primary btn-small export-btn" onclick="exportData()">📥 Export Data</button>
+                </div>
+                <div id="logbookEntries"></div>
+            </div>
+
+            <div id="newlog" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Create New Log Entry</h2>
+                <form id="logForm">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="title" required placeholder="e.g., Lucky 7s Scratch Card">
+                    </div>
+                    <div class="form-group">
+                        <label>Description (Optional)</label>
+                        <textarea id="description" rows="3" placeholder="Any notes about this card..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Buy Price (€)</label>
+                        <input type="number" id="buyPrice" step="0.01" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Winnings (€)</label>
+                        <input type="number" id="winnings" step="0.01" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Win Chance (1 in X)</label>
+                        <input type="number" id="winChance" step="0.01" required placeholder="e.g., 3.20 for 1 in 3.20">
+                        <small style="color: #6c757d;">Will be calculated as percentage automatically</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Log Entry</button>
+                </form>
+            </div>
+
+            <div id="settings" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Account Settings</h2>
+                
+                <div class="form-group">
+                    <label>Change Your Username</label>
+                    <input type="text" id="newUsername" placeholder="Enter new username">
+                </div>
+                <button onclick="changeUsername()" class="btn btn-primary">Update Username</button>
+
+                <div id="resetSection" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6;">
+                    <h3 style="color: #dc3545; margin-bottom: 15px;">⚠️ Reset All Data</h3>
+                    <p style="color: #6c757d; margin-bottom: 15px;">All 3 users must accept before data can be reset.</p>
+                    
+                    <div id="resetRequestBox"></div>
+                    
+                    <button onclick="requestDataReset()" class="btn btn-danger" id="resetRequestBtn">Request Data Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Log Entry</h3>
+            <form id="editForm">
+                <input type="hidden" id="editLogId">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Buy Price (€)</label>
+                    <input type="number" id="editBuyPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Winnings (€)</label>
+                    <input type="number" id="editWinnings" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Win Chance (1 in X)</label>
+                    <input type="number" id="editWinChance" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this entry?</p>
+            <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyATw2Bn_59NOzVE0uvTkNrnv26ms_crB9M",
+            authDomain: "lotterydatabase-18ab3.firebaseapp.com",
+            projectId: "lotterydatabase-18ab3",
+            storageBucket: "lotterydatabase-18ab3.firebasestorage.app",
+            messagingSenderId: "929806817454",
+            appId: "1:929806817454:web:58f8304f8d2852d681753f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let logs = [];
+        let users = [];
+        let deleteLogId = null;
+        let lastSyncTime = null;
+
+        // Anonymous auth
+        signInAnonymously(auth).catch(error => {
+            console.error("Anonymous auth failed:", error);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                checkLogin();
+            }
+        });
+
+        // Check if user is logged in
+        function checkLogin() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser) {
+                currentUser = loggedInUser;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('currentUser').textContent = currentUser;
+                initApp();
+            }
+        }
+
+        // Switch login tabs
+        window.switchLoginTab = function(tab) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Form').classList.add('active');
+            hideMessages();
+        };
+
+        function showError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('loginSuccess');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => successDiv.style.display = 'none', 3000);
+        }
+
+        function hideMessages() {
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginSuccess').style.display = 'none';
+        }
+
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const usersCollection = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersCollection);
+                
+                if (usersSnapshot.empty) {
+                    showError('No users found. Please register first.');
+                    return;
+                }
+
+                let foundUser = null;
+                let foundUserId = null;
+
+                usersSnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.username === username) {
+                        foundUser = userData;
+                        foundUserId = doc.id;
+                    }
+                });
+
+                if (!foundUser) {
+                    showError('Invalid username or password');
+                    return;
+                }
+
+                if (foundUser.password !== btoa(password)) {
+                    showError('Invalid username or password');
+                    return;
+                }
+
+                localStorage.setItem('loggedInUser', username);
+                localStorage.setItem('userKey', foundUserId);
+                currentUser = username;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('currentUser').textContent = currentUser;
+                initApp();
+            } catch (error) {
+                showError('Login failed: ' + error.message);
+            }
+        });
+
+        // Register form
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerPasswordConfirm').value;
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            if (username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+
+            try {
+                const usersCollection = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersCollection);
+                
+                const userCount = usersSnapshot.size;
+                if (userCount >= 3) {
+                    showError('Maximum 3 accounts already created');
+                    return;
+                }
+
+                let usernameExists = false;
+                usersSnapshot.forEach((doc) => {
+                    if (doc.data().username === username) {
+                        usernameExists = true;
+                    }
+                });
+
+                if (usernameExists) {
+                    showError('Username already taken');
+                    return;
+                }
+
+                const newUserDoc = doc(usersCollection);
+                await setDoc(newUserDoc, {
+                    username: username,
+                    password: btoa(password),
+                    acceptReset: false,
+                    createdAt: new Date().toISOString()
+                });
+
+                showSuccess('Account created successfully! Please login.');
+                setTimeout(() => {
+                    document.getElementById('registerForm').reset();
+                    switchLoginTab('login');
+                    document.querySelectorAll('.login-tab')[0].classList.add('active');
+                }, 2000);
+            } catch (error) {
+                showError('Registration failed: ' + error.message);
+            }
+        });
+
+        // Logout
+        window.logout = function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('loggedInUser');
+                localStorage.removeItem('userKey');
+                localStorage.removeItem('cachedLogs');
+                localStorage.removeItem('cachedUsers');
+                localStorage.removeItem('lastSyncTime');
+                location.reload();
+            }
+        };
+
+        // Initialize app
+        async function initApp() {
+            await loadData();
+            updateDashboard();
+            updateLogbook();
+            checkResetStatus();
+        }
+
+        // Load data from cache or Firebase
+        async function loadData() {
+            const now = Date.now();
+            lastSyncTime = parseInt(localStorage.getItem('lastSyncTime') || '0');
+            const twoHours = 2 * 60 * 60 * 1000;
+
+            if (now - lastSyncTime < twoHours) {
+                // Load from cache
+                logs = JSON.parse(localStorage.getItem('cachedLogs') || '[]');
+                users = JSON.parse(localStorage.getItem('cachedUsers') || '[]');
+                updateSyncInfo();
+            } else {
+                // Sync from Firebase
+                await syncFromFirebase();
+            }
+        }
+
+        async function syncFromFirebase() {
+            try {
+                const logsCollection = collection(db, 'logs');
+                const usersCollection = collection(db, 'users');
+
+                const [logsSnapshot, usersSnapshot] = await Promise.all([
+                    getDocs(logsCollection),
+                    getDocs(usersCollection)
+                ]);
+
+                logs = [];
+                logsSnapshot.forEach((doc) => {
+                    logs.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                users = [];
+                usersSnapshot.forEach((doc) => {
+                    users.push(doc.data().username);
+                });
+
+                localStorage.setItem('cachedLogs', JSON.stringify(logs));
+                localStorage.setItem('cachedUsers', JSON.stringify(users));
+                localStorage.setItem('lastSyncTime', Date.now().toString());
+                lastSyncTime = Date.now();
+                updateSyncInfo();
+            } catch (error) {
+                console.error('Sync failed:', error);
+            }
+        }
+
+        function updateSyncInfo() {
+            if (lastSyncTime) {
+                const date = new Date(lastSyncTime);
+                document.getElementById('lastSync').textContent = date.toLocaleString();
+            }
+        }
+
+        // Force sync button
+        window.forceSync = async function() {
+            await syncFromFirebase();
+            updateDashboard();
+            updateLogbook();
+            alert('Data synced successfully!');
+        };
+
+        // Switch tabs
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'dashboard') updateDashboard();
+            if (tabName === 'analytics') updateAnalytics();
+            if (tabName === 'logbook') updateLogbook();
+            if (tabName === 'settings') checkResetStatus();
+        };
+
+        // Update dashboard
+        function updateDashboard() {
+            const totalCards = logs.length;
+            const totalCosts = logs.reduce((sum, log) => sum + log.buyPrice, 0);
+            const totalWinnings = logs.reduce((sum, log) => sum + log.winnings, 0);
+            const netProfit = totalWinnings - totalCosts;
+            const wins = logs.filter(log => log.winnings > log.buyPrice).length;
+            
+            const avgCost = totalCards > 0 ? totalCosts / totalCards : 0;
+            const avgWin = totalCards > 0 ? totalWinnings / totalCards : 0;
+            const avgWinPercent = totalCards > 0 ? (wins / totalCards * 100) : 0;
+            const roi = totalCosts > 0 ? ((netProfit / totalCosts) * 100) : 0;
+            
+            const statsHTML = `
+                <div class="stat-card">
+                    <h3>Total Cards</h3>
+                    <div class="value">${totalCards}</div>
+                    <div class="sub-value">${wins} wins, ${totalCards - wins} losses</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Invested</h3>
+                    <div class="value">€${totalCosts.toFixed(2)}</div>
+                    <div class="sub-value">Avg: €${avgCost.toFixed(2)} per card</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Winnings</h3>
+                    <div class="value">€${totalWinnings.toFixed(2)}</div>
+                    <div class="sub-value">Avg: €${avgWin.toFixed(2)} per card</div>
+                </div>
+                <div class="stat-card ${netProfit >= 0 ? 'profit' : 'loss'}">
+                    <h3>Net Profit/Loss</h3>
+                    <div class="value">${netProfit >= 0 ? '+' : ''}€${netProfit.toFixed(2)}</div>
+                    <div class="sub-value">ROI: ${roi.toFixed(1)}%</div>
+                </div>
+            `;
+            
+            document.getElementById('statsGrid').innerHTML = statsHTML;
+
+            const summaryHTML = `
+                <h3>Quick Summary</h3>
+                <div class="summary-row">
+                    <span>Win Rate</span>
+                    <span><strong>${avgWinPercent.toFixed(1)}%</strong></span>
+                </div>
+                <div class="summary-row">
+                    <span>Average Profit per Card</span>
+                    <span><strong>${((totalWinnings - totalCosts) / (totalCards || 1)).toFixed(2)}€</strong></span>
+                </div>
+            `;
+            
+            document.getElementById('summaryBox').innerHTML = summaryHTML;
+            
+            const personStats = {};
+            users.forEach(user => {
+                const userLogs = logs.filter(log => log.owner === user);
+                const userCosts = userLogs.reduce((sum, log) => sum + log.buyPrice, 0);
+                personStats[user] = { 
+                    costs: userCosts, 
+                    cards: userLogs.length 
+                };
+            });
+            
+            const sharedWinningsPerPerson = totalWinnings / users.length;
+            
+            let personHTML = '<h3>Individual Balance (Winnings Shared Equally)</h3>';
+            personHTML += '<p style="margin-bottom: 15px; color: #6c757d; font-size: 0.9em;">All winnings are split equally. Each person pays their own card costs.</p>';
+            
+            users.forEach(user => {
+                const balance = sharedWinningsPerPerson - personStats[user].costs;
+                personHTML += `
+                    <div class="person-stat">
+                        <div>
+                            <strong>${user}</strong> (${personStats[user].cards} cards)
+                            <div style="font-size: 0.85em; color: #6c757d; margin-top: 3px;">
+                                Paid: €${personStats[user].costs.toFixed(2)} | Share: €${sharedWinningsPerPerson.toFixed(2)}
+                            </div>
+                        </div>
+                        <span style="font-weight: bold; font-size: 1.2em; color: ${balance >= 0 ? '#11998e' : '#dc3545'}">
+                            ${balance >= 0 ? '+' : ''}€${balance.toFixed(2)}
+                        </span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('personStats').innerHTML = personHTML;
+        }
+
+        // Update analytics
+        function updateAnalytics() {
+            if (logs.length > 0) {
+                const sortedByProfit = [...logs].sort((a, b) => (b.winnings - b.buyPrice) - (a.winnings - a.buyPrice));
+                const bestCard = sortedByProfit[0];
+                const worstCard = sortedByProfit[sortedByProfit.length - 1];
+                const biggestWin = [...logs].sort((a, b) => b.winnings - a.winnings)[0];
+                
+                const highlightHTML = `
+                    <div class="highlight-card">
+                        <h4>🏆 Best Profit</h4>
+                        <div class="card-name">${bestCard.title}</div>
+                        <div class="card-value">+€${(bestCard.winnings - bestCard.buyPrice).toFixed(2)}</div>
+                    </div>
+                    <div class="highlight-card worst">
+                        <h4>💸 Worst Loss</h4>
+                        <div class="card-name">${worstCard.title}</div>
+                        <div class="card-value">-€${Math.abs(worstCard.winnings - worstCard.buyPrice).toFixed(2)}</div>
+                    </div>
+                    <div class="highlight-card">
+                        <h4>💰 Biggest Win</h4>
+                        <div class="card-name">${biggestWin.title}</div>
+                        <div class="card-value">€${biggestWin.winnings.toFixed(2)}</div>
+                    </div>
+                `;
+                document.getElementById('highlightCards').innerHTML = highlightHTML;
+            } else {
+                document.getElementById('highlightCards').innerHTML = '<div class="empty-state"><p>No data yet</p></div>';
+            }
+
+            const ownerStats = {};
+            users.forEach(user => {
+                const userLogs = logs.filter(log => log.owner === user);
+                ownerStats[user] = userLogs.length;
+            });
+
+            const maxCards = Math.max(...Object.values(ownerStats), 1);
+            let ownerChartHTML = '';
+            users.forEach(user => {
+                const count = ownerStats[user] || 0;
+                const height = (count / maxCards) * 100;
+                ownerChartHTML += `
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div class="bar" style="height: ${height}%;">
+                            <div class="bar-value">${count}</div>
+                        </div>
+                        <div class="bar-label">${user}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('ownerChart').innerHTML = ownerChartHTML || '<p style="text-align: center;">No data yet</p>';
+
+            const cardTypes = {};
+            logs.forEach(log => {
+                if (!cardTypes[log.title]) {
+                    cardTypes[log.title] = { count: 0, totalCost: 0, totalWin: 0 };
+                }
+                cardTypes[log.title].count++;
+                cardTypes[log.title].totalCost += log.buyPrice;
+                cardTypes[log.title].totalWin += log.winnings;
+            });
+
+            let cardTypeHTML = '';
+            Object.keys(cardTypes).forEach(title => {
+                const data = cardTypes[title];
+                const roi = ((data.totalWin - data.totalCost) / data.totalCost * 100).toFixed(1);
+                const netProfit = data.totalWin - data.totalCost;
+                cardTypeHTML += `
+                    <div class="person-stat">
+                        <span><strong>${title}</strong> (${data.count} card${data.count > 1 ? 's' : ''})</span>
+                        <span>
+                            <span style="font-weight: bold; color: ${netProfit >= 0 ? '#11998e' : '#dc3545'}">
+                                ${netProfit >= 0 ? '+' : ''}€${netProfit.toFixed(2)}
+                            </span>
+                            <span class="roi-indicator ${netProfit >= 0 ? 'positive' : 'negative'}">
+                                ${roi}% ROI
+                            </span>
+                        </span>
+                    </div>
+                `;
+            });
+            document.getElementById('cardTypeStats').innerHTML = cardTypeHTML || '<p style="text-align: center;">No data yet</p>';
+        }
+
+        // Update logbook
+        function updateLogbook() {
+            const container = document.getElementById('logbookEntries');
+            const filterOwner = document.getElementById('filterOwner').value;
+            const filterResult = document.getElementById('filterResult').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            // Update filter dropdown
+            const filterSelect = document.getElementById('filterOwner');
+            filterSelect.innerHTML = '<option value="">All Owners</option>';
+            users.forEach(user => {
+                const selected = filterOwner === user ? 'selected' : '';
+                filterSelect.innerHTML += `<option value="${user}" ${selected}>${user}</option>`;
+            });
+            
+            let filteredLogs = [...logs];
+            
+            if (filterOwner) {
+                filteredLogs = filteredLogs.filter(log => log.owner === filterOwner);
+            }
+            
+            if (filterResult === 'win') {
+                filteredLogs = filteredLogs.filter(log => log.winnings > log.buyPrice);
+            } else if (filterResult === 'loss') {
+                filteredLogs = filteredLogs.filter(log => log.winnings <= log.buyPrice);
+            }
+            
+            if (sortBy === 'date') {
+                filteredLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else if (sortBy === 'winnings') {
+                filteredLogs.sort((a, b) => b.winnings - a.winnings);
+            } else if (sortBy === 'profit') {
+                filteredLogs.sort((a, b) => (b.winnings - b.buyPrice) - (a.winnings - a.buyPrice));
+            }
+            
+            if (filteredLogs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No entries found</h3>
+                        <p>Try adjusting your filters or create a new entry!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filteredLogs.forEach((log) => {
+                const isWin = log.winnings > log.buyPrice;
+                const netResult = log.winnings - log.buyPrice;
+                const winPercent = (1 / log.winChance * 100).toFixed(2);
+                const logDate = new Date(log.date).toLocaleDateString('en-GB', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const canEdit = log.owner === currentUser;
+                
+                html += `
+                    <div class="log-entry ${isWin ? 'win' : 'loss'}">
+                        <div class="log-header">
+                            <div>
+                                <div class="log-title">${isWin ? '🎉 ' : ''}${log.title}</div>
+                                <div class="log-date">${logDate}</div>
+                                ${log.description ? `<p style="margin-top: 5px; opacity: 0.9;">${log.description}</p>` : ''}
+                            </div>
+                            ${canEdit ? `
+                                <div class="log-actions">
+                                    <button class="edit-btn" onclick="openEditModal('${log.id}')">Edit</button>
+                                    <button class="delete-btn" onclick="openDeleteModal('${log.id}')">Delete</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="log-details">
+                            <div class="log-detail">
+                                <div class="log-detail-label">Buy Price</div>
+                                <div class="log-detail-value">€${log.buyPrice.toFixed(2)}</div>
+                            </div>
+                            <div class="log-detail">
+                                <div class="log-detail-label">Winnings</div>
+                                <div class="log-detail-value">€${log.winnings.toFixed(2)}</div>
+                            </div>
+                            <div class="log-detail">
+                                <div class="log-detail-label">Net Result</div>
+                                <div class="log-detail-value" style="color: ${isWin ? '#fff' : '#dc3545'}">
+                                    ${netResult >= 0 ? '+' : ''}€${netResult.toFixed(2)}
+                                </div>
+                            </div>
+                            <div class="log-detail">
+                                <div class="log-detail-label">Win Chance</div>
+                                <div class="log-detail-value">1 in ${log.winChance} (${winPercent}%)</div>
+                            </div>
+                            <div class="log-detail">
+                                <div class="log-detail-label">Owner</div>
+                                <div class="log-detail-value">${log.owner}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Create new log
+        document.getElementById('logForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const newLog = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                buyPrice: parseFloat(document.getElementById('buyPrice').value),
+                winnings: parseFloat(document.getElementById('winnings').value),
+                winChance: parseFloat(document.getElementById('winChance').value),
+                owner: currentUser,
+                date: new Date().toISOString()
+            };
+            
+            try {
+                const logsCollection = collection(db, 'logs');
+                const newLogDoc = doc(logsCollection);
+                await setDoc(newLogDoc, newLog);
+                
+                newLog.id = newLogDoc.id;
+                logs.push(newLog);
+                localStorage.setItem('cachedLogs', JSON.stringify(logs));
+                
+                this.reset();
+                alert('Log entry created successfully! 🎉');
+                document.querySelectorAll('.tab')[2].click();
+            } catch (error) {
+                alert('Failed to create log: ' + error.message);
+            }
+        });
+
+        // Edit modal
+        window.openEditModal = function(logId) {
+            const log = logs.find(l => l.id === logId);
+            if (!log || log.owner !== currentUser) {
+                alert('You can only edit your own cards');
+                return;
+            }
+
+            document.getElementById('editLogId').value = logId;
+            document.getElementById('editTitle').value = log.title;
+            document.getElementById('editDescription').value = log.description;
+            document.getElementById('editBuyPrice').value = log.buyPrice;
+            document.getElementById('editWinnings').value = log.winnings;
+            document.getElementById('editWinChance').value = log.winChance;
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('editModal').classList.remove('active');
+        };
+
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const logId = document.getElementById('editLogId').value;
+            
+            const updatedLog = {
+                title: document.getElementById('editTitle').value,
+                description: document.getElementById('editDescription').value,
+                buyPrice: parseFloat(document.getElementById('editBuyPrice').value),
+                winnings: parseFloat(document.getElementById('editWinnings').value),
+                winChance: parseFloat(document.getElementById('editWinChance').value)
+            };
+
+            try {
+                const logDoc = doc(db, 'logs', logId);
+                await updateDoc(logDoc, updatedLog);
+                
+                const logIndex = logs.findIndex(l => l.id === logId);
+                if (logIndex !== -1) {
+                    logs[logIndex] = { ...logs[logIndex], ...updatedLog };
+                    localStorage.setItem('cachedLogs', JSON.stringify(logs));
+                }
+                
+                closeEditModal();
+                updateLogbook();
+                alert('Log updated successfully!');
+            } catch (error) {
+                alert('Failed to update log: ' + error.message);
+            }
+        });
+
+        // Delete modal
+        window.openDeleteModal = function(logId) {
+            const log = logs.find(l => l.id === logId);
+            if (!log || log.owner !== currentUser) {
+                alert('You can only delete your own cards');
+                return;
+            }
+            deleteLogId = logId;
+            document.getElementById('confirmModal').classList.add('active');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('confirmModal').classList.remove('active');
+            deleteLogId = null;
+        };
+
+        window.confirmDelete = async function() {
+            if (deleteLogId) {
+                try {
+                    const logDoc = doc(db, 'logs', deleteLogId);
+                    await deleteDoc(logDoc);
+                    
+                    logs = logs.filter(l => l.id !== deleteLogId);
+                    localStorage.setItem('cachedLogs', JSON.stringify(logs));
+                    
+                    closeModal();
+                    updateLogbook();
+                } catch (error) {
+                    alert('Failed to delete log: ' + error.message);
+                }
+            }
+        };
+
+        // Change username
+        window.changeUsername = async function() {
+            const newUsername = document.getElementById('newUsername').value.trim();
+            
+            if (!newUsername || newUsername.length < 3) {
+                alert('Username must be at least 3 characters');
+                return;
+            }
+
+            if (newUsername === currentUser) {
+                alert('This is already your username');
+                return;
+            }
+
+            try {
+                const usersCollection = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersCollection);
+                
+                let usernameExists = false;
+                usersSnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.username === newUsername && userData.username !== currentUser) {
+                        usernameExists = true;
+                    }
+                });
+
+                if (usernameExists) {
+                    alert('Username already taken');
+                    return;
+                }
+
+                const userKey = localStorage.getItem('userKey');
+                const userDoc = doc(db, 'users', userKey);
+                await updateDoc(userDoc, { username: newUsername });
+
+                // Update logs
+                const logsCollection = collection(db, 'logs');
+                const logsSnapshot = await getDocs(logsCollection);
+                
+                const updatePromises = [];
+                logsSnapshot.forEach((logDoc) => {
+                    const logData = logDoc.data();
+                    if (logData.owner === currentUser) {
+                        updatePromises.push(updateDoc(doc(db, 'logs', logDoc.id), { owner: newUsername }));
+                    }
+                });
+                
+                if (updatePromises.length > 0) {
+                    await Promise.all(updatePromises);
+                }
+
+                const oldUsername = currentUser;
+                currentUser = newUsername;
+                localStorage.setItem('loggedInUser', newUsername);
+                
+                logs.forEach(log => {
+                    if (log.owner === oldUsername) {
+                        log.owner = newUsername;
+                    }
+                });
+                localStorage.setItem('cachedLogs', JSON.stringify(logs));
+                
+                const userIndex = users.indexOf(oldUsername);
+                if (userIndex !== -1) {
+                    users[userIndex] = newUsername;
+                    localStorage.setItem('cachedUsers', JSON.stringify(users));
+                }
+
+                document.getElementById('currentUser').textContent = currentUser;
+                document.getElementById('newUsername').value = '';
+                alert('Username updated successfully!');
+                updateLogbook();
+            } catch (error) {
+                alert('Failed to update username: ' + error.message);
+            }
+        };
+
+        // Reset data functions
+        window.requestDataReset = async function() {
+            if (!confirm('Are you sure you want to request a data reset? All 3 users must approve.')) {
+                return;
+            }
+
+            try {
+                const userKey = localStorage.getItem('userKey');
+                const userDoc = doc(db, 'users', userKey);
+                await updateDoc(userDoc, { acceptReset: true });
+                
+                alert('Reset request submitted. Waiting for other users...');
+                checkResetStatus();
+            } catch (error) {
+                alert('Failed to request reset: ' + error.message);
+            }
+        };
+
+        async function checkResetStatus() {
+            try {
+                const usersCollection = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersCollection);
+                
+                if (usersSnapshot.empty) return;
+                
+                const usersArray = [];
+                usersSnapshot.forEach((doc) => {
+                    usersArray.push({
+                        key: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                const allAccepted = usersArray.every(u => u.acceptReset === true);
+                const anyAccepted = usersArray.some(u => u.acceptReset === true);
+
+                let html = '';
+                
+                if (anyAccepted) {
+                    html = '<div class="reset-request">';
+                    html += '<h4>Data Reset Status</h4>';
+                    html += '<div class="reset-status">';
+                    
+                    usersArray.forEach(user => {
+                        const status = user.acceptReset ? 'accepted' : 'pending';
+                        html += `<span class="reset-user ${status}">${user.username}: ${user.acceptReset ? '✓ Accepted' : '⏳ Pending'}</span>`;
+                    });
+                    
+                    html += '</div>';
+                    
+                    if (allAccepted) {
+                        html += '<button onclick="executeReset()" class="btn btn-danger" style="margin-top: 10px;">Execute Reset Now</button>';
+                    }
+                    
+                    html += '</div>';
+                }
+                
+                document.getElementById('resetRequestBox').innerHTML = html;
+                
+            } catch (error) {
+                console.error('Failed to check reset status:', error);
+            }
+        }
+
+        window.executeReset = async function() {
+            if (!confirm('⚠️ FINAL WARNING: This will delete ALL data permanently. Continue?')) {
+                return;
+            }
+
+            try {
+                // Delete all logs
+                const logsCollection = collection(db, 'logs');
+                const logsSnapshot = await getDocs(logsCollection);
+                
+                const deletePromises = [];
+                logsSnapshot.forEach((logDoc) => {
+                    deletePromises.push(deleteDoc(doc(db, 'logs', logDoc.id)));
+                });
+                await Promise.all(deletePromises);
+                
+                // Reset acceptReset for all users
+                const usersCollection = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersCollection);
+                
+                const updatePromises = [];
+                usersSnapshot.forEach((userDoc) => {
+                    updatePromises.push(updateDoc(doc(db, 'users', userDoc.id), { acceptReset: false }));
+                });
+                await Promise.all(updatePromises);
+
+                localStorage.removeItem('cachedLogs');
+                localStorage.removeItem('lastSyncTime');
+                logs = [];
+                
+                alert('All data has been reset successfully! 🗑️');
+                location.reload();
+            } catch (error) {
+                alert('Failed to reset data: ' + error.message);
+            }
+        };
+
+        // Export data
+        window.exportData = function() {
+            const csvContent = 'data:text/csv;charset=utf-8,' + 
+                'Date,Title,Description,Buy Price,Winnings,Net Result,Win Chance,Win %,Owner\n' +
+                logs.map(log => {
+                    const netResult = log.winnings - log.buyPrice;
+                    const winPercent = (1 / log.winChance * 100).toFixed(2);
+                    const date = new Date(log.date).toLocaleDateString('en-GB');
+                    return `"${date}","${log.title}","${log.description}",${log.buyPrice},${log.winnings},${netResult},${log.winChance},${winPercent},"${log.owner}"`;
+                }).join('\n');
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `lottery_tracker_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // Initialize on load
+        checkLogin();
+
+    </script>
+</body>
+</html>
