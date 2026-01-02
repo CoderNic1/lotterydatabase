@@ -808,9 +808,26 @@
                 </div>
                 <button onclick="changeUsername()" class="btn btn-primary">Update Username</button>
 
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6;">
+                    <h3 style="margin-bottom: 15px;">Change Password</h3>
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" id="currentPassword" placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" placeholder="Confirm new password">
+                    </div>
+                    <button onclick="changePassword()" class="btn btn-primary">Update Password</button>
+                </div>
+
                 <div id="resetSection" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6;">
                     <h3 style="color: #dc3545; margin-bottom: 15px;">⚠️ Reset All Data</h3>
-                    <p style="color: #6c757d; margin-bottom: 15px;">All 3 users must accept before data can be reset.</p>
+                    <p style="color: #6c757d; margin-bottom: 15px;">All 3 users must accept before reset can be executed. This will delete all logs permanently.</p>
                     
                     <div id="resetRequestBox"></div>
                     
@@ -1316,18 +1333,31 @@
         // Update logbook
         function updateLogbook() {
             const container = document.getElementById('logbookEntries');
-            const filterOwner = document.getElementById('filterOwner').value;
-            const filterResult = document.getElementById('filterResult').value;
-            const sortBy = document.getElementById('sortBy').value;
             
-            // Update filter dropdown
-            const filterSelect = document.getElementById('filterOwner');
-            filterSelect.innerHTML = '<option value="">All Owners</option>';
-            users.forEach(user => {
-                const selected = filterOwner === user ? 'selected' : '';
-                filterSelect.innerHTML += `<option value="${user}" ${selected}>${user}</option>`;
-            });
+            // Get current filter values
+            let filterOwner = '';
+            let filterResult = '';
+            let sortBy = 'date';
             
+            const filterOwnerElement = document.getElementById('filterOwner');
+            const filterResultElement = document.getElementById('filterResult');
+            const sortByElement = document.getElementById('sortBy');
+            
+            if (filterOwnerElement) filterOwner = filterOwnerElement.value;
+            if (filterResultElement) filterResult = filterResultElement.value;
+            if (sortByElement) sortBy = sortByElement.value;
+            
+            // Update filter dropdown with users
+            if (filterOwnerElement) {
+                const currentValue = filterOwner;
+                filterOwnerElement.innerHTML = '<option value="">All Owners</option>';
+                users.forEach(user => {
+                    const selected = currentValue === user ? 'selected' : '';
+                    filterOwnerElement.innerHTML += `<option value="${user}" ${selected}>${user}</option>`;
+                });
+            }
+            
+            // Apply filters
             let filteredLogs = [...logs];
             
             if (filterOwner) {
@@ -1340,6 +1370,7 @@
                 filteredLogs = filteredLogs.filter(log => log.winnings <= log.buyPrice);
             }
             
+            // Apply sorting
             if (sortBy === 'date') {
                 filteredLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
             } else if (sortBy === 'winnings') {
@@ -1611,6 +1642,55 @@
             }
         };
 
+        // Change password
+        window.changePassword = async function() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all password fields');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                alert('New password must be at least 6 characters');
+                return;
+            }
+
+            try {
+                const userKey = localStorage.getItem('userKey');
+                const userDoc = doc(db, 'users', userKey);
+                const userSnapshot = await getDoc(userDoc);
+                
+                if (!userSnapshot.exists()) {
+                    alert('User not found');
+                    return;
+                }
+
+                const userData = userSnapshot.data();
+                if (userData.password !== btoa(currentPassword)) {
+                    alert('Current password is incorrect');
+                    return;
+                }
+
+                await updateDoc(userDoc, { password: btoa(newPassword) });
+
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmNewPassword').value = '';
+                
+                alert('Password updated successfully!');
+            } catch (error) {
+                alert('Failed to update password: ' + error.message);
+            }
+        };
+
         // Reset data functions
         window.requestDataReset = async function() {
             if (!confirm('Are you sure you want to request a data reset? All 3 users must approve.')) {
@@ -1629,6 +1709,23 @@
             }
         };
 
+        window.cancelResetRequest = async function() {
+            if (!confirm('Cancel your reset request?')) {
+                return;
+            }
+
+            try {
+                const userKey = localStorage.getItem('userKey');
+                const userDoc = doc(db, 'users', userKey);
+                await updateDoc(userDoc, { acceptReset: false });
+                
+                alert('Reset request cancelled.');
+                checkResetStatus();
+            } catch (error) {
+                alert('Failed to cancel reset: ' + error.message);
+            }
+        };
+
         async function checkResetStatus() {
             try {
                 const usersCollection = collection(db, 'users');
@@ -1637,14 +1734,21 @@
                 if (usersSnapshot.empty) return;
                 
                 const usersArray = [];
+                const currentUserKey = localStorage.getItem('userKey');
+                let currentUserAccepted = false;
+                
                 usersSnapshot.forEach((doc) => {
-                    usersArray.push({
+                    const userData = {
                         key: doc.id,
                         ...doc.data()
-                    });
+                    };
+                    usersArray.push(userData);
+                    if (doc.id === currentUserKey) {
+                        currentUserAccepted = userData.acceptReset;
+                    }
                 });
 
-                const allAccepted = usersArray.every(u => u.acceptReset === true);
+                const allAccepted = usersArray.length === 3 && usersArray.every(u => u.acceptReset === true);
                 const anyAccepted = usersArray.some(u => u.acceptReset === true);
 
                 let html = '';
@@ -1661,8 +1765,14 @@
                     
                     html += '</div>';
                     
+                    if (currentUserAccepted) {
+                        html += '<button onclick="cancelResetRequest()" class="btn btn-secondary" style="margin-top: 10px;">Cancel My Request</button>';
+                    }
+                    
                     if (allAccepted) {
-                        html += '<button onclick="executeReset()" class="btn btn-danger" style="margin-top: 10px;">Execute Reset Now</button>';
+                        html += '<button onclick="executeReset()" class="btn btn-danger" style="margin-top: 10px; margin-left: 10px;">Execute Reset Now</button>';
+                    } else {
+                        html += '<p style="margin-top: 10px; color: #856404; font-weight: 600;">Waiting for all 3 users to accept...</p>';
                     }
                     
                     html += '</div>';
